@@ -1,0 +1,26 @@
+{
+  "name": "Portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "nuxt",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "generate": "nuxt generate"
+  },
+  "dependencies": {
+    "animate.css": "^4.1.1",
+    "autoprefixer": "^10.2.0",
+    "core-js": "^3.6.5",
+    "fs": "^0.0.1-security",
+    "nuxt": "^2.14.6",
+    "postcss": "^8.2.3",
+    "tailwindcss": "^2.0.2"
+  },
+  "devDependencies": {
+    "@nuxtjs/google-fonts": "^1.2.0",
+    "@nuxtjs/tailwindcss": "^3.1.0",
+    "node-sass": "^5.0.0",
+    "sass-loader": "^10.1.0"
+  }
+}
