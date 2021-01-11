@@ -1,17 +1,16 @@
 <template>
-  <div class="console" :class="[consoleStatus, consoleAnimation ? 'anim' : '']">
-    <a
-      href="#"
-      v-if="consoleStatus === 'minimize'"
-      @click.prevent="toggleMinimize"
-      class="absolute top-0 bottom-0 left-0 right-0"
-    ></a>
+  <div ref="console" class="console" :class="status">
+    <a @click="animate('maximize')" class="toggle"></a>
+    <a @click="animate('close')" class="icon-toggle">
+      <div class="icon">>_</div>
+      <div class="icon-title">{{ title }}</div>
+    </a>
     <div class="bar">
       <small>>_ {{ title }}</small>
       <div class="dots">
-        <div @click.prevent="toggleMaximize"></div>
-        <div @click.prevent="toggleMinimize"></div>
-        <div @click.prevent="toggleClose"></div>
+        <div @click.prevent="animate('maximize')"></div>
+        <div @click.prevent="animate('minimize')"></div>
+        <div @click.prevent="animate('close')"></div>
       </div>
     </div>
     <div class="slot">
@@ -28,37 +27,48 @@ export default {
   },
   data() {
     return {
-      consoleAnimation: false,
+      status: null,
+      top: 0,
+      left: 0,
+      width: 0,
+      height: 0,
     };
   },
-  computed: {
-    consoleStatus: {
-      get() {
-        return this.value;
-      },
-      set(value) {
-        this.$emit("input", value);
-      },
-    },
-  },
   methods: {
-    toggleMaximize() {
-      this.consoleStatus = "maximize";
-    },
-    toggleMinimize() {
-      if (this.consoleStatus != "minimize") {
-        this.$emit("minimize");
-        this.consoleAnimation = true;
-        this.consoleStatus = "minimize";
+    animate(status) {
+      if (this.status === status) {
+        this.$refs.console.style.top = `${this.top}px`;
+        this.$refs.console.style.left = `${this.left}px`;
+        this.$refs.console.style.width = `${this.width}px`;
+        this.$refs.console.style.height = `${this.height}px`;
         setTimeout(() => {
-          this.consoleAnimation = false;
-        }, 100);
+          this.status = null;
+          this.$refs.console.style.top = null;
+          this.$refs.console.style.left = null;
+          this.$refs.console.style.width = null;
+          this.$refs.console.style.height = null;
+          this.top = 0;
+          this.left = 0;
+          this.width = null;
+          this.height = null;
+        }, 200);
       } else {
-        this.consoleStatus = "normal";
+        this.top = this.$refs.console.offsetTop;
+        this.left = this.$refs.console.offsetLeft;
+        this.width = this.$refs.console.offsetWidth;
+        this.height = this.$refs.console.offsetHeight;
+        this.$refs.console.style.top = `${this.top}px`;
+        this.$refs.console.style.left = `${this.left}px`;
+        this.$refs.console.style.width = `${this.width}px`;
+        this.$refs.console.style.height = `${this.height}px`;
+        this.status = status;
+        setTimeout(() => {
+          this.$refs.console.style.top = null;
+          this.$refs.console.style.left = null;
+          this.$refs.console.style.width = null;
+          this.$refs.console.style.height = null;
+        }, 50);
       }
-    },
-    toggleClose() {
-      this.$emit("close");
     },
   },
 };
@@ -66,41 +76,58 @@ export default {
 
 <style lang="scss" scoped>
 .console {
-  @apply bg-gray-800 px-2 py-1 rounded-lg;
-  transition: all 200ms ease-in-out;
-  transform: translate(0px, 0px) scale(1) !important;
+  @apply bg-gray-800 px-2 py-1 rounded-lg relative;
   font-family: "Source Code Pro", monospace;
-  &.maximize {
-    @apply fixed top-0 left-0 right-0 min-w-full min-h-full;
+
+  .toggle {
+    @apply hidden absolute top-0 bottom-0 left-0 right-0 cursor-pointer;
+  }
+
+  .icon-toggle {
+    @apply hidden flex-col items-center justify-center cursor-pointer;
   }
 
   &.minimize {
-    &.anim{
-      transform: translate(-50vw, 50vh) scale(0) !important;
+    @apply absolute transition-all ease-in-out duration-200;
+    top: calc(100vh - 3rem);
+    left: 2rem;
+
+    &:hover {
+      top: calc(100vh - 3.5rem);
     }
 
-    &:not(.anim){
-      transform: translate(0px, 0px) scale(1) !important;
-      @apply fixed left-2;
-      top: calc(100vh - 3.5rem);
+    .toggle {
+      @apply block;
+    }
 
-      &:hover {
-        top: calc(100vh - 4.5rem);
-      }
+    .bar .dots {
+      @apply hidden;
+    }
 
-      .bar {
-        .dots {
-          @apply max-w-0;
-        }
-      }
-      .slot {
-        @apply invisible max-w-0;
-      }
+    .slot {
+      @apply max-w-0 max-h-0 opacity-0;
     }
   }
 
+  &.maximize {
+    @apply absolute transition-all ease-in-out duration-200 top-0 left-0 m-0 w-full h-full;
+  }
+
   &.close {
-    display: none !important;
+    @apply absolute transition-all ease-in-out duration-200 w-auto h-auto top-4 left-4 opacity-0 bg-transparent;
+
+    .bar,
+    .slot {
+      display: none;
+    }
+
+    .icon-toggle {
+      @apply flex;
+
+      .icon{
+        @apply w-14 h-14 bg-gray-800 text-white text-2xl font-bold rounded-xl flex justify-center items-center;
+      }
+    }
   }
 
   .bar {
