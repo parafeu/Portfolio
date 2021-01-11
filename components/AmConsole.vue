@@ -1,6 +1,6 @@
 <template>
   <div ref="console" class="console" :class="status">
-    <a @click="animate('maximize')" class="toggle"></a>
+    <a @click="animate('minimize')" class="toggle"></a>
     <a @click="animate('close')" class="icon-toggle">
       <div class="icon">>_</div>
       <div class="icon-title">{{ title }}</div>
